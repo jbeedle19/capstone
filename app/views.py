@@ -9,7 +9,7 @@ from django.core.paginator import Paginator
 from django.shortcuts import render
 from django.urls import reverse
 
-# from .models import User
+from .models import User
 
 def index(request):
     return render(request, 'app/index.html')
