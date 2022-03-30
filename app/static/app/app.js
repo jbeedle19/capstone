@@ -101,7 +101,7 @@ const createTaskEl = function(taskDataObj) {
 
     tasks.push(taskDataObj);
 
-    saveTasks();
+    addTask(taskDataObj);
 
     const taskActionsEl = createTaskActions(taskIdCounter);
     listItemEl.appendChild(taskActionsEl);
@@ -124,17 +124,19 @@ const completeEditTask = function(taskName, taskType, taskId) {
     taskSelected.querySelector("h3.task-name").textContent = taskName;
     taskSelected.querySelector("span.task-type").textContent = taskType;
 
-    // Loop through task array and task object with new content
+    // Loop through task array and update task object with new content
+    let taskStatus;
     for (var i = 0; i < tasks.length; i++) {
         if (tasks[i].id === parseInt(taskId)) {
             tasks[i].name = taskName;
             tasks[i].type = taskType;
+            taskStatus = tasks[i].status;
         }
     };
 
     success("Task updated successfully!");
 
-    saveTasks();
+    saveTask(taskId, taskName, taskType, taskStatus);
 
     // Resets the form
     formEl.removeAttribute("data-task-id");
@@ -240,7 +242,7 @@ const deleteTask = function(taskId) {
     // Reassign tasks array to be the same as updatedTaskArr
     tasks = updatedTaskArr;
 
-    saveTasks();
+    deleteTask(taskId);
 };
 
 // Function to change the status of the task
@@ -266,13 +268,16 @@ const taskStatusChangeHandler = function(event) {
     }
 
     // Update task's in tasks array
+    let taskName, taskType;
     for (let i = 0; i < tasks.length; i++) {
         if (tasks[i].id === parseInt(taskId)) {
             tasks[i].status = statusValue;
+            taskName = tasks[i].name;
+            taskType = tasks[i].type;
         }
     }
 
-    saveTasks();
+    saveTask(taskId, taskName, taskType, statusValue);
 };
 
 // Function to drag the tasks
@@ -316,12 +321,16 @@ const dropTaskHandler = function(event) {
     dropZoneEl.appendChild(draggableElement);
 
     // Loop through tasks array to find and update the updated task's status
+    let taskName, taskType, taskStatus;
     for (let i = 0; i < tasks.length; i++) {
         if (tasks[i].id === parseInt(id)) {
             tasks[i].status = statusSelectEl.value.toLowerCase();
+            taskName = tasks[i].name;
+            taskType = tasks[i].type;
+            taskStatus = tasks[i].status;
         }
     }
-    saveTasks();
+    saveTask(id, taskName, taskType, taskStatus);
 }
 
 // Dragleave Function to help with hover styling when dragging task
@@ -332,30 +341,55 @@ const dragLeaveHandler = function(event) {
     }
 }
 
-// Function to save tasks to localStorage
-const saveTasks = function() {
-    localStorage.setItem("tasks", JSON.stringify(tasks));
+// Function to add task initially
+function addTask(task) {
+    // Make call to API to add the task to the DB
+    fetch('/tasks/add', {
+        method: 'POST',
+        body: JSON.stringify({
+            id: task.id,
+            name: task.name,
+            status: task.status,
+            type: task.type,
+        })
+    })
+    .then(response => response.json())
+    .then(result => console.log(result))
 }
 
-// Function to load the tasks that are stored in localStorage
-const loadTasks = function() {
+// Function to save/update tasks
+function saveTask(id, name, type, status) {
+    // Old code using local storage
+    // localStorage.setItem("tasks", JSON.stringify(tasks));
+
+    fetch(`/tasks/save/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+            name: name,
+            type: type,
+            status: status
+        })
+    });
+}
+
+// Function to load the tasks that are stored in the DB
+async function loadTasks() {
+    // Old code using local storage
     // Gets task from localStorage
-    const storedTasks = localStorage.getItem("tasks");
-    // Converts tasks from the string format back into an array of objects
-    if (storedTasks === null) {
-        tasks = [];
-        return false;
-    }
+    // const storedTasks = localStorage.getItem("tasks");
+    // // Converts tasks from the string format back into an array of objects
+    // if (storedTasks === null) {
+    //     tasks = [];
+    //     return false;
+    // }
 
-    tasks = JSON.parse(storedTasks);
+    // tasks = JSON.parse(storedTasks);
 
-    // This is for Code Optimization 4.5.7, but I couldn't get it to work...
-    // Loop through storedTasks array
-    /* for (var i = 0; i < storedTasks.length; i++) {
-        // Pass each task object into the 'createTaskEl()' function
-        createTaskEl(storedTasks[i]);
-        console.log(storedTasks[i]);
-    } */
+    // Make call to API to get existing tasks
+    const response = await fetch('/tasks');
+    const storedTasks = await response.json();
+
+    tasks = storedTasks;
 
     // Iterates through a tasks array and creates task elements on the page from it
     for (let i = 0; i < tasks.length; i++) {
