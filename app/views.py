@@ -9,7 +9,7 @@ from django.core.paginator import Paginator
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User
+from .models import User, Task
 
 @login_required(login_url='/login', redirect_field_name=None)
 def index(request):
