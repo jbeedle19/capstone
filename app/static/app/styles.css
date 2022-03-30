@@ -82,6 +82,11 @@ footer {
   flex-shrink: 0;
 }
 
+#logout {
+  color: var(--tertiary);
+  text-decoration: none;
+}
+
 .page-title {
   color: var(--primary);
   margin-bottom: 5px;
