@@ -14,6 +14,11 @@ html, body {
   height: 100%;
 }
 
+h1, h2, h3 {
+  font-weight: bold;
+  line-height: var(--bs-body-line-height);
+}
+
 body {
   background: #ededed;
   color: var(--grey);
@@ -62,7 +67,7 @@ li {
   border-radius: 12px;
 }
 
-.main-form .form-group {
+.main-form .main-form-group {
   margin: 10px 6px 10px 0;
   flex: 1;
 }
@@ -228,11 +233,11 @@ footer {
 }
 
 @media screen and (max-width: 980px) {
-  .main-form .form-group {
+  .main-form .main-form-group {
     flex: 1 100%;
   }
 
-  .main-form .form-group button {
+  .main-form .main-form-group button {
     width: 100%;
   }
 

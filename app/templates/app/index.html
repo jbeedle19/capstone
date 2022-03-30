@@ -8,10 +8,10 @@
         <p>Click the button below to add a new task!</p>
         <!-- Form for creating new task with Name and Type -->
         <form id="task-form" class="main-form">
-            <div class="form-group">
-                <input type="text" name="task-name" placeholder="Enter Task Name" />
+            <div class="main-form-group">
+                <input autofocus autocomplete="off" type="text" name="task-name" placeholder="Enter Task Name" />
             </div>
-            <div class="form-group">
+            <div class="main-form-group">
                 <select name="task-type" class="select-dropdown">
                     <option value="" disabled selected>Pick a task type</option>
                     <option value="Home">Home</option>
@@ -19,7 +19,7 @@
                     <option value="School">School</option>
                 </select>
             </div>
-            <div class="form-group">
+            <div class="main-form-group">
                 <button class="main-btn" id="save-task" type="submit">Add Task</button>
             </div>
         </form>

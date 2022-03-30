@@ -120,7 +120,7 @@ var createTaskActions = function(taskId) {
     // Create Edit button
     var editButtonEl = document.createElement("button");
     editButtonEl.textContent = "Edit";
-    editButtonEl.className = "btn edit-btn";
+    editButtonEl.className = "main-btn edit-btn";
     editButtonEl.setAttribute("data-task-id", taskId);
 
     actionContainerEl.appendChild(editButtonEl);
@@ -128,7 +128,7 @@ var createTaskActions = function(taskId) {
     // Create Delete button
     var deleteButtonEl = document.createElement("button");
     deleteButtonEl.textContent = "Delete";
-    deleteButtonEl.className = "btn delete-btn";
+    deleteButtonEl.className = "main-btn delete-btn";
     deleteButtonEl.setAttribute("data-task-id", taskId);
 
     actionContainerEl.appendChild(deleteButtonEl);
