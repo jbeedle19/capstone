@@ -1,5 +1,3 @@
-var taskIdCounter = 0;
-
 const pageContentEl = document.querySelector("#page-content");
 const formEl = document.querySelector("#task-form");
 const tasksToDoEl = document.querySelector("#tasks-to-do");
@@ -8,6 +6,7 @@ const tasksCompletedEl = document.querySelector("#tasks-completed");
 const alertHolder = document.querySelector("#alertHolder");
 
 var tasks = [];
+var taskIDCounter = 0;
 
 function alert(message) {
     const wrapper = document.createElement('div');
@@ -72,48 +71,52 @@ const taskFormHandler = function(event) {
         };
 
         // Send it as an argument to createTaskEl
-        createTaskEl(taskDataObj);
+        addTask(taskDataObj);
+        // Not the best way to do this but it works for now!
+        location.reload();
     }
 }
 
 // Function to create a new task
-const createTaskEl = function(taskDataObj) {
-    // a new <li> element is created
-    const listItemEl = document.createElement("li");
-    // it is given the "task-item" class to be styled
-    listItemEl.className = "task-item";
+//async function createTaskEl(taskDataObj) {
+    // Original Code with local storage
+    // // a new <li> element is created
+    // const listItemEl = document.createElement("li");
+    // // it is given the "task-item" class to be styled
+    // listItemEl.className = "task-item";
 
-    // Add task id as a custom attribute
-    listItemEl.setAttribute("data-task-id", taskIdCounter);
-    // Makes listItemEl draggable
-    listItemEl.setAttribute("draggable", "true");
+    // // Add task id as a custom attribute
+    // listItemEl.setAttribute("data-task-id", taskIDCounter);
+    // // Makes listItemEl draggable
+    // listItemEl.setAttribute("draggable", "true");
 
-    // Create div to hold task info and add to list item
-    const taskInfoEl = document.createElement("div");
-    // Give it a class name
-    taskInfoEl.className = "task-info";
-    // Add HTML content to div
-    taskInfoEl.innerHTML = "<h3 class='task-name'>" + taskDataObj.name + "</h3><span class='task-type'>" + taskDataObj.type + "</span";
-    // Add it to the HTML
-    listItemEl.appendChild(taskInfoEl);
+    // // Create div to hold task info and add to list item
+    // const taskInfoEl = document.createElement("div");
+    // // Give it a class name
+    // taskInfoEl.className = "task-info";
+    // // Add HTML content to div
+    // taskInfoEl.innerHTML = "<h3 class='task-name'>" + taskDataObj.name + "</h3><span class='task-type'>" + taskDataObj.type + "</span";
+    // // Add it to the HTML
+    // listItemEl.appendChild(taskInfoEl);
 
-    taskDataObj.id = taskIdCounter;
+    // taskDataObj.id = taskIDCounter;
 
-    tasks.push(taskDataObj);
+    // console.log(tasks);
+    // tasks.push(taskDataObj);
 
-    addTask(taskDataObj);
+    // addTask(taskDataObj);
 
-    const taskActionsEl = createTaskActions(taskIdCounter);
-    listItemEl.appendChild(taskActionsEl);
+    // const taskActionsEl = createTaskActions(taskIdCounter);
+    // listItemEl.appendChild(taskActionsEl);
 
-    tasksToDoEl.appendChild(listItemEl);
+    // tasksToDoEl.appendChild(listItemEl);
 
-    // and finally it will be added into the HTML
-    tasksToDoEl.appendChild(listItemEl);
+    // // and finally it will be added into the HTML
+    // tasksToDoEl.appendChild(listItemEl);
 
-    // Increase task counter for next unique id
-    taskIdCounter++;
-};
+    // // Increase task counter for next unique id
+    // taskIDCounter++;
+//};
 
 // Function to finish editing a task
 const completeEditTask = function(taskName, taskType, taskId) {
@@ -242,7 +245,7 @@ const deleteTask = function(taskId) {
     // Reassign tasks array to be the same as updatedTaskArr
     tasks = updatedTaskArr;
 
-    deleteTask(taskId);
+    completeDeleteTask(taskId);
 };
 
 // Function to change the status of the task
@@ -372,6 +375,12 @@ function saveTask(id, name, type, status) {
     });
 }
 
+function completeDeleteTask(id) {
+    fetch(`/tasks/delete/${id}`, {
+        method: 'DELETE'
+    });
+}
+
 // Function to load the tasks that are stored in the DB
 async function loadTasks() {
     // Old code using local storage
@@ -393,14 +402,12 @@ async function loadTasks() {
 
     // Iterates through a tasks array and creates task elements on the page from it
     for (let i = 0; i < tasks.length; i++) {
-        // To keep the id for each task in sync, reassign the id property of task[i] to the value of taskIdCounter
-        tasks[i].id = taskIdCounter;
         // Create an <li> element and store it in a variable called listItemEl
         const listItemEl = document.createElement("li");
         //Give it a classname attribute of task-item
         listItemEl.className = "task-item";
         //With setAttribute(), give it a data-task-id attribute with a value of tasks[i].id
-        listItemEl.setAttribute("data-task-id", taskIdCounter);
+        listItemEl.setAttribute("data-task-id", tasks[i].id);
         //With setAttribute(), give it a draggable attribute with a value of true
         listItemEl.setAttribute("draggable", "true");
 
@@ -424,7 +431,6 @@ async function loadTasks() {
             listItemEl.querySelector("select[name='status-change']").selectedIndex = 2;
             tasksCompletedEl.appendChild(listItemEl);
         }
-        taskIdCounter++;
     }
 }
 

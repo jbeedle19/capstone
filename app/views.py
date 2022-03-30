@@ -76,7 +76,12 @@ def register(request):
 def load_tasks(request):
 
     # Filter for tasks associated with current user
-    tasks = Task.objects.filter(task_user=request.user)
+    # Query for requested task
+    try:
+        tasks = Task.objects.filter(task_user=request.user)
+    except Task.DoesNotExist:
+        tasks = []
+        return JsonResponse(tasks, safe=False, status=204)
 
     # Return tasks in chronological order
     return JsonResponse([task.serialize() for task in tasks], safe=False)
@@ -95,13 +100,12 @@ def add_task(request):
     user = request.user
 
     # Get contents of task obj
-    id = data.get('id', '')
     name = data.get('name', '')
     status = data.get('status', '')
     type  = data.get('type', '')
 
     # Save task
-    task = Task(task_user=user, id=id, name=name, status=status, type=type)
+    task = Task(task_user=user, name=name, status=status, type=type)
     task.save()
 
     return JsonResponse({'message': 'Task saved successfully'}, status=201)
@@ -134,4 +138,18 @@ def save_task(request, task_id):
 @csrf_exempt
 @login_required
 def delete_task(request, task_id):
-    pass
+
+    # Updating a task must be done via PUT
+    if request.method != 'DELETE':
+        return JsonResponse({'error': 'DELETE request is required'}, status=400)
+
+    # Query for requested task
+    try:
+        task = Task.objects.get(task_user=request.user, pk=task_id)
+    except Task.DoesNotExist:
+        return JsonResponse({'error': 'Task not found'}, status=404)
+
+    # Delete the task
+    task.delete()
+
+    return HttpResponse(status=204)
